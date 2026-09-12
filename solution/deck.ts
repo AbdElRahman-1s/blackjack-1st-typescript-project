@@ -9,7 +9,7 @@ const values = [
 ];
 
 
-const deck: Card[] = [];
+export const deck: Card[] = [];
 
 
 for (let i = 0; i < values.length; i++) {
