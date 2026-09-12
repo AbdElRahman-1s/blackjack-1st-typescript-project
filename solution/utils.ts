@@ -1,5 +1,5 @@
-import type { Card } from "./types";
-import { deck } from "./deck";
+import type { Card } from "./types.js";
+import { deck } from "./deck.js";
 
 
 

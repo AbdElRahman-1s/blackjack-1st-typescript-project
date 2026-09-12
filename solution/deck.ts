@@ -1,4 +1,4 @@
-import type { Suit, Card } from "./types";
+import type { Suit, Card } from "./types.js";
 
 
 const suit: Suit[] = ["♠", "♥", "♦", "♣"];
