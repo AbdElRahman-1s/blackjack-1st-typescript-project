@@ -13,3 +13,9 @@ export function drawCard(deck: Card[]): Card {
   return deck.pop()!;
 }
 
+
+export function displayHand(hand: Card[]): void {
+  for(const card of hand){
+    console.log("Player:",card.value,card.suit);
+  }
+}

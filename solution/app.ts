@@ -1,19 +1,7 @@
 import PromptSync from "prompt-sync";
-import { shuffleDeck, drawCard } from "./utils.js";
+import { shuffleDeck, drawCard, displayHand } from "./utils.js";
 import type { Card } from "./types.js";
 import { deck } from "./deck.js";
-
-
-const playerHand: Card[] = [];
-const dealerHand: Card[] = [];
-
-shuffleDeck(deck);
-
-playerHand.push(drawCard(deck));
-playerHand.push(drawCard(deck));
-
-dealerHand.push(drawCard(deck));
-dealerHand.push(drawCard(deck));
 
 
 function calculateHandValue(hand: Card[]): number {
@@ -37,14 +25,39 @@ function calculateHandValue(hand: Card[]): number {
   return total;
 }
 
-
 const prompt = PromptSync();
+
+let money = 100;
+
+let bet = Number(prompt("Place your bet: "));
+while (bet > money || bet<= 0) {
+  console.log("Bet must be greater than 0 and less than or equal to your money!");
+  bet = Number(prompt("Please change your bet to valid value: "));
+}
+
+
+const playerHand: Card[] = [];
+const dealerHand: Card[] = [];
+
+shuffleDeck(deck);
+
+playerHand.push(drawCard(deck));
+playerHand.push(drawCard(deck));
+
+dealerHand.push(drawCard(deck));
+dealerHand.push(drawCard(deck));
+
+
 
 let playerBlackjack = false;
 let dealerBlackjack = false;
 let playerBusted = false;
 let playerValue = calculateHandValue(playerHand);
 let dealerValue = calculateHandValue(dealerHand);
+displayHand(playerHand);
+console.log("Total:", playerValue);
+console.log("Dealer:", dealerHand[0].value, dealerHand[0].suit);
+console.log("Dealer: Hidden");
 
 if (playerValue === 21 && playerHand.length === 2) {
   playerBlackjack = true;
@@ -57,12 +70,12 @@ if (dealerValue === 21 && dealerHand.length === 2) {
 
 if (playerBlackjack || dealerBlackjack) {
   if (playerBlackjack && dealerBlackjack) {
-  console.log("Tie.");
-} else if (playerBlackjack && !dealerBlackjack) {
-  console.log("BlackJack, Player Win -_-");
-} else if (dealerBlackjack && !playerBlackjack) {
-  console.log("BlackJack, You Lost ):");
-}
+    console.log("Tie.");
+  } else if (playerBlackjack && !dealerBlackjack) {
+    console.log("BlackJack, Player Win -_-");
+  } else if (dealerBlackjack && !playerBlackjack) {
+    console.log("BlackJack, You Lost ):");
+  }
 } else {
   while (true) {
 
@@ -75,6 +88,8 @@ if (playerBlackjack || dealerBlackjack) {
     if (action === "hit") {
       playerHand.push(drawCard(deck));
       playerValue = calculateHandValue(playerHand);
+      displayHand(playerHand);
+      console.log("Total:", playerValue);
       if (playerValue > 21) {
         playerBusted = true;
         break;
@@ -88,9 +103,13 @@ if (playerBlackjack || dealerBlackjack) {
     console.log("You lost ):");
   } else {
     dealerValue = calculateHandValue(dealerHand);
+    displayHand(dealerHand);
+    console.log("Total:", dealerValue);
     while (dealerValue < 17) {
       dealerHand.push(drawCard(deck));
       dealerValue = calculateHandValue(dealerHand);
+      displayHand(dealerHand);
+      console.log("Total:", dealerValue);
     }
 
     if (dealerValue > 21) {
