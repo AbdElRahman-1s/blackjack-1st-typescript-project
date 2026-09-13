@@ -28,7 +28,7 @@ function calculateHandValue(hand: Card[]): number {
 const prompt = PromptSync();
 
 let money = 100;
-
+while(money > 0){
 let bet = Number(prompt("Place your bet: "));
 while (bet > money || bet<= 0) {
   console.log("Bet must be greater than 0 and less than or equal to your money!");
@@ -73,8 +73,10 @@ if (playerBlackjack || dealerBlackjack) {
     console.log("Tie.");
   } else if (playerBlackjack && !dealerBlackjack) {
     console.log("BlackJack, Player Win -_-");
+    money += (1.5*bet);
   } else if (dealerBlackjack && !playerBlackjack) {
     console.log("BlackJack, You Lost ):");
+    money -= bet;
   }
 } else {
   while (true) {
@@ -101,6 +103,7 @@ if (playerBlackjack || dealerBlackjack) {
 
   if (playerBusted) {
     console.log("You lost ):");
+    money -= bet;
   } else {
     dealerValue = calculateHandValue(dealerHand);
     displayHand(dealerHand);
@@ -114,11 +117,14 @@ if (playerBlackjack || dealerBlackjack) {
 
     if (dealerValue > 21) {
       console.log("Player Win -_-");
+      money += bet;
     } else {
       if (playerValue > dealerValue) {
         console.log("Player Win -_-");
+        money += bet;
       } else if (playerValue < dealerValue) {
         console.log("Dealers Win ):");
+        money -= bet;
       } else {
         console.log("Tie.");
       }
@@ -127,6 +133,12 @@ if (playerBlackjack || dealerBlackjack) {
 }
 
 
+console.log("Your Money: ",money);
 
 
+}
 
+
+if (money <= 0) {
+  console.log("Your money is finished! Game Over.");
+}
