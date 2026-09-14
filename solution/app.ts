@@ -1,29 +1,10 @@
 import PromptSync from "prompt-sync";
-import { shuffleDeck, drawCard, displayHand } from "./utils.js";
+import { shuffleDeck, drawCard, displayHand , calculateHandValue} from "./utils.js";
 import type { Card } from "./types.js";
 import { deck } from "./deck.js";
 
 
-function calculateHandValue(hand: Card[]): number {
-  let total = 0;
-  for (const card of hand) {
-    if (card.value === "J" ||
-      card.value === "Q" ||
-      card.value === "K") {
-      total += 10;
-    } else if (card.value === "A") {
-      if (11 + total <= 21) {
-        total += 11;
-      } else if (11 + total > 21) {
-        total++;
-      }
-    } else {
-      total += Number(card.value);
-    }
-  }
 
-  return total;
-}
 function getBet(money: number): number {
   let bet = Number(prompt("Place your bet: "));
   while (bet > money || bet <= 0) {
@@ -111,6 +92,53 @@ function checkWinner(playerValue: number, dealerValue: number): string {
   }
 }
 
+function isBlackjack(hand: Card[]): boolean {
+  return calculateHandValue(hand) === 21 && hand.length === 2;
+}
+
+function handleBlackjack(
+  playerBlackjack: boolean,
+  dealerBlackjack: boolean,
+  money: number,
+  bet: number
+): number {
+  if (playerBlackjack && dealerBlackjack) {
+    console.log("Tie.");
+  } else if (playerBlackjack && !dealerBlackjack) {
+    console.log("BlackJack, Player Win -_-");
+    money += 1.5 * bet;
+  } else if (dealerBlackjack && !playerBlackjack) {
+    console.log("BlackJack, You Lost ):");
+    money -= bet;
+  }
+
+  return money;
+}
+
+function handleRoundResult(
+  playerBusted: boolean,
+  playerValue: number,
+  dealerValue: number,
+  money: number,
+  bet: number
+): number {
+  if (playerBusted) {
+    console.log("You lost ):");
+    money -= bet;
+  } else {
+    const result = checkWinner(playerValue, dealerValue);
+    console.log(result);
+
+    if (result === "Player Win -_-") {
+      money += bet;
+    } else if (result === "Dealers Win ):") {
+      money -= bet;
+    }
+  }
+
+  return money;
+}
+
 const prompt = PromptSync();
 
 let money = 100;
@@ -123,8 +151,6 @@ while (money > 0) {
 
 
 
-  let playerBlackjack = false;
-  let dealerBlackjack = false;
   let playerValue = calculateHandValue(playerHand);
   let dealerValue = calculateHandValue(dealerHand);
   displayHand(playerHand);
@@ -132,43 +158,33 @@ while (money > 0) {
   console.log("Dealer:", dealerHand[0].value, dealerHand[0].suit);
   console.log("Dealer: Hidden");
 
-  if (playerValue === 21 && playerHand.length === 2) {
-    playerBlackjack = true;
-  }
-  if (dealerValue === 21 && dealerHand.length === 2) {
-    dealerBlackjack = true;
-  }
+  const playerBlackjack = isBlackjack(playerHand);
+  const dealerBlackjack = isBlackjack(dealerHand);
 
 
 
   if (playerBlackjack || dealerBlackjack) {
-    if (playerBlackjack && dealerBlackjack) {
-      console.log("Tie.");
-    } else if (playerBlackjack && !dealerBlackjack) {
-      console.log("BlackJack, Player Win -_-");
-      money += (1.5 * bet);
-    } else if (dealerBlackjack && !playerBlackjack) {
-      console.log("BlackJack, You Lost ):");
-      money -= bet;
-    }
+    money = handleBlackjack(
+      playerBlackjack,
+      dealerBlackjack,
+      money,
+      bet
+    );
   } else {
     const { playerBusted, playerValue } = playerTurn(playerHand);
 
 
-    if (playerBusted) {
-      console.log("You lost ):");
-      money -= bet;
-    } else {
+    if (!playerBusted) {
       dealerValue = dealerTurn(dealerHand);
-
-      const result = checkWinner(playerValue, dealerValue);
-      console.log(result);
-      if (result === "Player Win -_-") {
-        money += bet;
-      } else if (result === "Dealers Win ):") {
-        money -= bet;
-      }
     }
+
+    money = handleRoundResult(
+      playerBusted,
+      playerValue,
+      dealerValue,
+      money,
+      bet
+    );
   }
 
 
