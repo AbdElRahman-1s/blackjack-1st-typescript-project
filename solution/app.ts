@@ -1,5 +1,5 @@
 import PromptSync from "prompt-sync";
-import { shuffleDeck, drawCard, displayHand , calculateHandValue} from "./utils.js";
+import { shuffleDeck, drawCard, displayHand, calculateHandValue } from "./utils.js";
 import type { Card } from "./types.js";
 import { deck } from "./deck.js";
 
@@ -141,7 +141,15 @@ function handleRoundResult(
 
 const prompt = PromptSync();
 
+export const playerName = prompt("Enter your name: ");
+
 let money = 100;
+
+console.log(`Welcome ${playerName}!`);
+console.log(`Your Money: ${money}`);
+
+
+
 while (money > 0) {
 
   let bet = getBet(money);

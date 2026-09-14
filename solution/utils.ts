@@ -1,5 +1,5 @@
 import type { Card } from "./types.js";
-import { deck } from "./deck.js";
+import { playerName } from "./app.js";
 
 
 
@@ -15,9 +15,12 @@ export function drawCard(deck: Card[]): Card {
 
 
 export function displayHand(hand: Card[]): void {
+  let cards = ''
   for(const card of hand){
-    console.log("Player:",card.value,card.suit);
+    cards += `${card.value} ${card.suit}    `;
   }
+  console.log(`${playerName}:`, cards);
+  
 }
 
 
